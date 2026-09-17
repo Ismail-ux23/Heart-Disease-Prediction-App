@@ -1,0 +1,27 @@
+# Android
+.gradle/
+build/
+*/build/
+local.properties
+.idea/
+*.iml
+.DS_Store
+
+# Python
+__pycache__/
+*.pyc
+venv/
+.venv/
+
+# Database
+*.db
+
+# Environment
+.env.gradle/
+build/
+*/build/
+local.properties
+.idea/
+*.iml
+.DS_Store
+
