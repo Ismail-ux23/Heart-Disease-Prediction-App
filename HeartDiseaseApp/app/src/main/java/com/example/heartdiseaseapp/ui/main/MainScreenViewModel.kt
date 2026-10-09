@@ -28,27 +28,27 @@ class MainScreenViewModel : ViewModel() {
     }
 
     fun predict(age: String, gender: String, bloodPressure: String, cholesterol: String, heartRate: String) {
+        val input = try {
+            PredictionInput.parse(age, gender, bloodPressure, cholesterol, heartRate)
+        } catch (error: IllegalArgumentException) {
+            _uiState.value = MainScreenUiState.Error(error.message ?: "Check your input values.")
+            return
+        }
         _uiState.value = MainScreenUiState.Loading
 
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                // Convert inputs to numbers
-                val ageNum = age.toFloatOrNull() ?: 0f
-                // For gender, we can assume 'Male' is 1 and 'Female' is 0
-                val genderNum = if (gender.equals("Male", ignoreCase = true) || gender == "1") 1f else 0f
-                val bpNum = bloodPressure.toFloatOrNull() ?: 0f
-                val cholNum = cholesterol.toFloatOrNull() ?: 0f
-                val hrNum = heartRate.toFloatOrNull() ?: 0f
-
                 val jsonParam = JSONObject()
-                jsonParam.put("age", ageNum)
-                jsonParam.put("gender", genderNum)
-                jsonParam.put("blood_pressure", bpNum)
-                jsonParam.put("cholesterol", cholNum)
-                jsonParam.put("heart_rate", hrNum)
+                jsonParam.put("age", input.age)
+                jsonParam.put("gender", input.gender)
+                jsonParam.put("blood_pressure", input.bloodPressure)
+                jsonParam.put("cholesterol", input.cholesterol)
+                jsonParam.put("heart_rate", input.heartRate)
 
                 val url = URL("http://10.0.2.2:5000/predict")
                 val conn = url.openConnection() as HttpURLConnection
+                conn.connectTimeout = 10_000
+                conn.readTimeout = 15_000
                 conn.requestMethod = "POST"
                 conn.setRequestProperty("Content-Type", "application/json; charset=UTF-8")
                 conn.setRequestProperty("Accept", "application/json")
@@ -73,7 +73,9 @@ class MainScreenViewModel : ViewModel() {
                     _uiState.value = MainScreenUiState.Success(prediction, confidence, recommendations)
                     loadHistory()
                 } else {
-                    _uiState.value = MainScreenUiState.Error("Server returned code: $responseCode")
+                    val errorText = conn.errorStream?.bufferedReader()?.use { it.readText() }
+                    val message = errorText?.let { JSONObject(it).optString("error") }
+                    _uiState.value = MainScreenUiState.Error(message?.takeIf { it.isNotBlank() } ?: "Server returned code: $responseCode")
                 }
                 conn.disconnect()
 
@@ -89,6 +91,8 @@ class MainScreenViewModel : ViewModel() {
             try {
                 val connection = URL("http://10.0.2.2:5000/history?user_id=default_user&limit=20")
                     .openConnection() as HttpURLConnection
+                connection.connectTimeout = 10_000
+                connection.readTimeout = 15_000
                 connection.requestMethod = "GET"
                 connection.setRequestProperty("Accept", "application/json")
 
