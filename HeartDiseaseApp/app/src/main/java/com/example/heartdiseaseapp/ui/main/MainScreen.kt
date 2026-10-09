@@ -70,7 +70,7 @@ fun MainScreen(
         item {
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 Text("HEART HEALTH", style = MaterialTheme.typography.labelMedium, color = Teal, fontWeight = FontWeight.Bold)
-                Text("Know your risk.", style = MaterialTheme.typography.displaySmall, color = Cloud, fontWeight = FontWeight.Bold)
+                Text("Explore the model.", style = MaterialTheme.typography.displaySmall, color = Cloud, fontWeight = FontWeight.Bold)
                 Text("A calm snapshot from five everyday health measurements.", color = MutedCloud)
             }
         }
@@ -84,7 +84,7 @@ fun MainScreen(
                     GlassField(gender, { gender = it }, "Gender  •  Male / Female or 1 / 0")
                     Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                         GlassField(bloodPressure, { bloodPressure = it }, "Blood pressure", KeyboardType.Number, Modifier.weight(1f))
-                        GlassField(heartRate, { heartRate = it }, "Heart rate", KeyboardType.Number, Modifier.weight(1f))
+                        GlassField(heartRate, { heartRate = it }, "Max achieved HR (bpm)", KeyboardType.Number, Modifier.weight(1f))
                     }
                     GlassField(cholesterol, { cholesterol = it }, "Cholesterol", KeyboardType.Number)
                 }
@@ -100,7 +100,7 @@ fun MainScreen(
                 shape = RoundedCornerShape(18.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = Teal, contentColor = Ink)
             ) {
-                Text("Check my risk", fontWeight = FontWeight.Bold)
+                Text("Run demo prediction", fontWeight = FontWeight.Bold)
             }
         }
 
@@ -114,7 +114,7 @@ fun MainScreen(
                         Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                             Text("YOUR RESULT", style = MaterialTheme.typography.labelMedium, color = Teal, fontWeight = FontWeight.Bold)
                             Text(result.prediction, style = MaterialTheme.typography.headlineSmall, color = Cloud, fontWeight = FontWeight.Bold)
-                            Text("Estimated high-risk probability: ${result.confidencePercent}%", color = MutedCloud)
+                            Text("Model class-1 score: ${result.confidencePercent}%", color = MutedCloud)
                             HorizontalDivider(color = GlassBorder)
                             Text("Recommendations", style = MaterialTheme.typography.titleMedium, color = Cloud, fontWeight = FontWeight.SemiBold)
                             result.recommendations.forEach { recommendation -> Text("• $recommendation", color = MutedCloud) }
